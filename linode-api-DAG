@@ -1,0 +1,23 @@
+from airflow import DAG
+from airflow.operators.http_operator import SimpleHttpOperator
+from datetime import datetime
+
+default_args = {
+    'owner': 'airflow',
+    'start_date': datetime(2023, 1, 1),
+    'retries': 1
+}
+
+dag = DAG('linode_api_test', default_args=default_args, schedule_interval='@daily')
+
+test_linode_api = SimpleHttpOperator(
+    task_id='test_linode_api',
+    method='GET',
+    http_conn_id='linode_api',
+    endpoint='/linode/instances',  # Update with your specific endpoint
+    headers={"Content-Type": "application/json"},
+    xcom_push=True,
+    dag=dag
+)
+
+test_linode_api
